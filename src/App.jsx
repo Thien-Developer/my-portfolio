@@ -230,14 +230,14 @@ const StudentIDCard = () => {
     <div className="absolute top-0 left-0 z-[60] flex flex-col items-start pointer-events-none origin-top-left transition-all duration-700">
       {/* Dây đeo */}
       <motion.div
-        initial={{ height: 15 }}
+        initial={{ height: 32 }}
         animate={{
-          height: step === 0 ? 15 : 140,
+          height: step === 0 ? 32 : 140,
         }}
         transition={{
           height: { type: "spring", stiffness: 70, damping: 20 },
         }}
-        className="w-[3px] relative origin-top flex flex-col items-center"
+        className="w-2 relative origin-top flex flex-col items-center"
       >
         <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,#334155,#334155_2px,#64748b_2px,#64748b_4px)] rounded-full shadow-lg" />
         <div className="absolute top-0 w-3 h-3 bg-slate-800 rounded-full border border-slate-600 -translate-y-1/2" />
