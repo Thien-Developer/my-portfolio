@@ -227,7 +227,7 @@ const StudentIDCard = () => {
   };
 
   return (
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center pointer-events-none origin-top transition-all duration-700">
+    <div className="absolute top-0 left-0 z-[60] flex flex-col items-start pointer-events-none origin-top-left transition-all duration-700">
       {/* Dây đeo */}
       <motion.div
         initial={{ height: 15 }}
@@ -266,10 +266,10 @@ const StudentIDCard = () => {
           scale: { type: "spring", stiffness: 150, damping: 25 }
         }}
         style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
-        className="relative w-44 h-64 md:w-56 md:h-80 cursor-pointer pointer-events-auto group mt-[-2px] origin-top"
+        className="relative w-44 h-64 md:w-56 md:h-80 cursor-pointer pointer-events-auto group mt-[-2px] origin-top-left"
       >
         {/* Móc sắt */}
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-5 h-5 border-4 border-slate-500 rounded-full z-20 bg-slate-900 shadow-lg" />
+        <div className="absolute -top-3 left-0 w-5 h-5 border-4 border-slate-500 rounded-full z-20 bg-slate-900 shadow-lg" />
 
         {/* Mặt trước */}
         <div
@@ -435,9 +435,14 @@ export default function App() {
           animate={{ y: 0, opacity: 1 }}
           className="max-w-5xl mx-auto bg-slate-900/90 backdrop-blur-xl border border-white/5 p-2 rounded-xl md:rounded-2xl flex justify-between items-center shadow-2xl pointer-events-auto"
         >
-          <div className="px-2 md:px-4 font-black text-base md:text-xl tracking-tighter cursor-pointer group" onClick={() => scrollToSection('hero')}>
-            <span className="text-white group-hover:text-sky-400 transition-colors uppercase tracking-widest pl-0">THIEN</span>
-            <span className="text-sky-500">.DEV</span>
+          <div className="flex items-center">
+            <div className="relative w-0 h-0">
+              <StudentIDCard />
+            </div>
+            <div className="px-2 md:px-4 font-black text-base md:text-xl tracking-tighter cursor-pointer group" onClick={() => scrollToSection('hero')}>
+              <span className="text-white group-hover:text-sky-400 transition-colors uppercase tracking-widest pl-0">THIEN</span>
+              <span className="text-sky-500">.DEV</span>
+            </div>
           </div>
           <div className="flex items-center gap-1">
             {['skills', 'projects', 'contact'].map((id) => (
@@ -455,8 +460,6 @@ export default function App() {
 
       {/* 1. HERO SECTION */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center pt-24 md:pt-32 pb-12 px-4 overflow-hidden">
-        <StudentIDCard />
-
         {/* Background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] aspect-square bg-sky-500/10 blur-[120px] rounded-full -z-10 animate-pulse" />
 
