@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
-import * as THREE from 'three';
 import {
   Code2,
   Terminal,
@@ -29,194 +28,8 @@ import {
 } from 'lucide-react';
 import avatarImg from './assets/images/avatar.jpg';
 
-// --- COMPONENT RENDER 3D: MODERN LOGIC MECHANICAL KEYBOARD ---
-const CyberWorkspace = ({ onHover }) => {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(28, containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
-    camera.position.set(0, 5.5, 7.2);
-    camera.lookAt(0, -0.6, 0);
-
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: "high-performance"
-    });
-    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-
-    containerRef.current.appendChild(renderer.domElement);
-
-    const group = new THREE.Group();
-    scene.add(group);
-
-    const updateScale = () => {
-      if (!containerRef.current) return;
-      const width = containerRef.current.clientWidth;
-      // Responsive scale for the 3D keyboard
-      const scale = width < 480 ? 0.6 : width < 768 ? 0.8 : 1.05;
-      group.scale.set(scale, scale, scale);
-    };
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-
-    const topLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    topLight.position.set(0, 10, 5);
-    scene.add(topLight);
-
-    const skills = [
-      { label: "HTML", symbol: "</>", color: "#f97316", group: "main", level: "95%" },
-      { label: "CSS", symbol: "{#}", color: "#0ea5e9", group: "main", level: "95%" },
-      { label: "JS", symbol: "JS", color: "#eab308", group: "main", level: "90%" },
-      { label: "TS", symbol: "TS", color: "#3b82f6", group: "main", level: "85%" },
-      { label: "PHP", symbol: "🐘", color: "#818cf8", group: "main", level: "85%" },
-      { label: "REACT", symbol: "⚛", color: "#61dbfb", group: "accent", level: "80%" },
-      { label: "NEXTJS", symbol: "▲", color: "#f8fafc", group: "accent", level: "85%" },
-      { label: "NODE", symbol: "⬢", color: "#4ade80", group: "accent", level: "85%" },
-      { label: "NESTJS", symbol: "N", color: "#ef4444", group: "accent", level: "80%" },
-      { label: "TAILWIND", symbol: "~", color: "#22d3ee", group: "accent", level: "90%" },
-      { label: "MYSQL", symbol: "DB", color: "#f59e0b", group: "sys" },
-      { label: "SUPABASE", symbol: "⚡", color: "#4ade80", group: "sys" },
-      { label: "SOCKET.IO", symbol: "⚙", color: "#a855f7", group: "sys" },
-      { label: "GITHUB", symbol: "git", color: "#94a3b8", group: "sys" },
-      { label: "AWS EC2", symbol: "☁", color: "#ea580c", group: "sys" },
-    ];
-
-    const createKeyTexture = (text, symbol, color, groupType) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-
-      let bgColor = '#1e293b';
-      if (groupType === 'accent') bgColor = '#0f172a';
-      if (groupType === 'sys') bgColor = '#020617';
-
-      ctx.fillStyle = bgColor;
-      ctx.beginPath();
-      ctx.roundRect(0, 0, 512, 512, 50);
-      ctx.fill();
-
-      ctx.fillStyle = color;
-      ctx.font = 'bold 180px "Inter", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(symbol, 256, 220);
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '900 60px "Inter", sans-serif';
-      ctx.fillText(text, 256, 410);
-
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      return texture;
-    };
-
-    const chassis = new THREE.Mesh(
-      new THREE.BoxGeometry(6.6, 0.4, 3.8),
-      new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.2 })
-    );
-    chassis.position.y = -0.15;
-    group.add(chassis);
-
-    const keyGeo = new THREE.BoxGeometry(0.75, 0.5, 0.75);
-    const keyMeshes = [];
-
-    skills.forEach((skill, i) => {
-      const row = Math.floor(i / 5);
-      const col = i % 5;
-
-      const material = new THREE.MeshStandardMaterial({
-        map: createKeyTexture(skill.label, skill.symbol, skill.color, skill.group),
-        emissive: skill.color,
-        emissiveIntensity: 0.15,
-        roughness: 0.4,
-        metalness: 0.1
-      });
-
-      const key = new THREE.Mesh(keyGeo, material);
-      key.position.set(-2.1 + col * 1.05, 0.35, -1 + row * 1.05);
-      key.userData = { ...skill, originalY: 0.35 };
-      group.add(key);
-      keyMeshes.push(key);
-    });
-
-    updateScale();
-
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-      updateScale();
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    const raycaster = new THREE.Raycaster();
-    const mPos = new THREE.Vector2();
-
-    const onMouseMove = (e) => {
-      const rect = containerRef.current.getBoundingClientRect();
-      mPos.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mPos.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mPos, camera);
-      const intersects = raycaster.intersectObjects(keyMeshes);
-
-      keyMeshes.forEach(k => {
-        k.position.y = THREE.MathUtils.lerp(k.position.y, k.userData.originalY, 0.15);
-        k.material.emissiveIntensity = THREE.MathUtils.lerp(k.material.emissiveIntensity, 0.15, 0.1);
-      });
-
-      if (intersects.length > 0) {
-        const obj = intersects[0].object;
-        obj.position.y = 0.22;
-        obj.material.emissiveIntensity = 4.0;
-
-        let infoText = "";
-        if (obj.userData.group === "sys") {
-          infoText = `${obj.userData.label} • CÔNG CỤ BỔ TRỢ`;
-        } else {
-          infoText = `${obj.userData.label} • THÔNG THẠO: ${obj.userData.level}`;
-        }
-        onHover(infoText);
-      }
-    };
-
-    containerRef.current.addEventListener('mousemove', onMouseMove);
-
-    let animId;
-    const animate = (time) => {
-      const t = time * 0.001;
-      group.rotation.y = Math.sin(t * 0.1) * 0.04;
-      group.rotation.x = 0.25;
-      renderer.render(scene, camera);
-      animId = requestAnimationFrame(animate);
-    };
-    animate(0);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('resize', handleResize);
-      if (containerRef.current) {
-        containerRef.current.removeEventListener('mousemove', onMouseMove);
-        if (renderer.domElement.parentNode) {
-          containerRef.current.removeChild(renderer.domElement);
-        }
-      }
-    };
-  }, []);
-
-  return <div ref={containerRef} className="w-full h-full min-h-[350px] md:min-h-[450px]" />;
-};
+// 3D keyboard scene pulls in three.js — load it in its own chunk instead of the main bundle
+const CyberWorkspace = lazy(() => import('./components/CyberWorkspace'));
 
 const StudentIDCard = () => {
   const [step, setStep] = useState(0);
@@ -340,6 +153,16 @@ export default function App() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key !== 'Escape') return;
+      setSelectedProject(null);
+      setShowZaloQR(false);
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
+
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -351,14 +174,14 @@ export default function App() {
   };
 
   const skillsData = [
-    { name: "HTML / CSS", level: "95%", icon: <Palette className="w-5 h-5" />, color: "text-orange-400" },
-    { name: "JavaScript / TS", level: "90%", icon: <Code2 className="w-5 h-5" />, color: "text-yellow-400" },
-    { name: "PHP / Java", level: "85%", icon: <Coffee className="w-5 h-5" />, color: "text-indigo-400" },
-    { name: "React / Next.js", level: "85%", icon: <Layers className="w-5 h-5" />, color: "text-sky-400" },
-    { name: "Node.js / NestJS", level: "85%", icon: <Terminal className="w-5 h-5" />, color: "text-green-400" },
-    { name: "Tailwind CSS", level: "90%", icon: <Monitor className="w-5 h-5" />, color: "text-cyan-400" },
-    { name: "Socket.io", level: "80%", icon: <MessageSquare className="w-5 h-5" />, color: "text-emerald-400" },
-    { name: "MySQL / Supabase", level: "85%", icon: <Database className="w-5 h-5" />, color: "text-purple-400" },
+    { name: "HTML / CSS", level: "Thành thạo", tier: 3, icon: <Palette className="w-5 h-5" />, color: "text-orange-400" },
+    { name: "JavaScript / TS", level: "Thành thạo", tier: 3, icon: <Code2 className="w-5 h-5" />, color: "text-yellow-400" },
+    { name: "PHP / Java", level: "Vững", tier: 2, icon: <Coffee className="w-5 h-5" />, color: "text-indigo-400" },
+    { name: "React / Next.js", level: "Vững", tier: 2, icon: <Layers className="w-5 h-5" />, color: "text-sky-400" },
+    { name: "Node.js / NestJS", level: "Vững", tier: 2, icon: <Terminal className="w-5 h-5" />, color: "text-green-400" },
+    { name: "Tailwind CSS", level: "Thành thạo", tier: 3, icon: <Monitor className="w-5 h-5" />, color: "text-cyan-400" },
+    { name: "Socket.io", level: "Đang trau dồi", tier: 1, icon: <MessageSquare className="w-5 h-5" />, color: "text-emerald-400" },
+    { name: "MySQL / Supabase", level: "Vững", tier: 2, icon: <Database className="w-5 h-5" />, color: "text-purple-400" },
     { name: "Git & GitHub", level: null, icon: <Github className="w-5 h-5" />, color: "text-white" },
     { name: "AWS EC2 / Apache", level: null, icon: <Cloud className="w-5 h-5" />, color: "text-orange-600" },
     { name: "Groq AI Integration", level: null, icon: <Zap className="w-5 h-5" />, color: "text-yellow-500" },
@@ -398,6 +221,7 @@ export default function App() {
       ],
       icon: <MessageSquare className="w-10 h-10 text-indigo-400" />,
       theme: "indigo",
+      status: "in-progress",
       liveUrl: null,
       githubUrl: "https://github.com/Thien-Developer/NextTalk"
     },
@@ -500,7 +324,9 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <CyberWorkspace onHover={setHoverDetail} />
+            <Suspense fallback={<div className="w-full h-full min-h-[350px] md:min-h-[450px] flex items-center justify-center text-slate-600 text-xs font-black uppercase tracking-widest">Đang tải...</div>}>
+              <CyberWorkspace onHover={setHoverDetail} />
+            </Suspense>
           </div>
         </div>
       </section>
@@ -535,14 +361,17 @@ export default function App() {
 
                 {s.level ? (
                   <>
-                    <div className="text-white font-black text-lg md:text-2xl italic tracking-tighter mb-3">{s.level}</div>
-                    <div className="w-full bg-white/5 h-1 md:h-1.5 rounded-full overflow-hidden">
+                    <div className="text-white font-black text-sm md:text-base italic tracking-tighter mb-3">{s.level}</div>
+                    <div className="flex gap-1.5">
+                      {[1, 2, 3].map((dot) => (
                         <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{ width: s.level }}
-                            transition={{ duration: 1.2, ease: "circOut" }}
-                            className="h-full bg-gradient-to-r from-sky-600 to-sky-400"
+                          key={dot}
+                          initial={{ scaleX: 0 }}
+                          whileInView={{ scaleX: 1 }}
+                          transition={{ duration: 0.4, delay: dot * 0.1 }}
+                          className={`h-1 md:h-1.5 flex-1 rounded-full origin-left ${dot <= s.tier ? 'bg-gradient-to-r from-sky-600 to-sky-400' : 'bg-white/5'}`}
                         />
+                      ))}
                     </div>
                   </>
                 ) : (
@@ -574,6 +403,11 @@ export default function App() {
                 whileHover={{ y: -8 }}
                 className="p-8 md:p-10 bg-slate-900 border border-white/5 rounded-[2rem] group transition-all relative overflow-hidden flex flex-col min-h-[400px]"
               >
+                {p.status === 'in-progress' && (
+                  <span className="absolute top-6 right-6 md:top-8 md:right-8 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[8px] font-black uppercase tracking-widest">
+                    Đang phát triển
+                  </span>
+                )}
                 <div className="mb-6 md:mb-8 group-hover:scale-110 transition-transform duration-500">{p.icon}</div>
                 <h3 className="text-xl md:text-2xl font-black mb-3 uppercase italic tracking-tighter text-white">{p.title}</h3>
                 <p className={`font-mono text-[8px] md:text-[9px] mb-5 uppercase font-black tracking-[0.2em] p-2 bg-white/5 rounded-lg w-fit ${
@@ -649,7 +483,14 @@ export default function App() {
               </button>
 
               <div className="p-8 md:p-10 pb-0 flex-shrink-0">
-                <div className="mb-6">{selectedProject.icon}</div>
+                <div className="mb-6 flex items-center justify-between pr-8">
+                  {selectedProject.icon}
+                  {selectedProject.status === 'in-progress' && (
+                    <span className="px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[8px] font-black uppercase tracking-widest">
+                      Đang phát triển
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter text-white mb-3 pr-10">{selectedProject.title}</h3>
                 <p className={`font-mono text-[8px] md:text-[9px] mb-2 uppercase font-black tracking-[0.2em] p-2 bg-white/5 rounded-lg w-fit ${
                   selectedProject.theme === 'sky' ? 'text-sky-400' : selectedProject.theme === 'indigo' ? 'text-indigo-400' : 'text-emerald-400'
