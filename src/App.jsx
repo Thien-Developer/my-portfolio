@@ -389,7 +389,7 @@ export default function App() {
     {
       title: "NextTalk",
       tech: "NESTJS • SOCKET.IO • SUPABASE",
-      desc: "Ứng dụng nhắn tin thời gian thực kiểu Zalo. Backend đã deploy live trên Render, frontend đang hoàn thiện.",
+      desc: "Ứng dụng nhắn tin thời gian thực. Backend đã deploy live trên Render, frontend đang hoàn thiện — dự án đang trong quá trình phát triển.",
       features: [
         "Xây dựng backend NestJS + TypeScript, REST API và schema dữ liệu bằng Prisma trên PostgreSQL (Supabase).",
         "Nhắn tin thời gian thực, quản lý nhóm chat bằng Socket.io.",
