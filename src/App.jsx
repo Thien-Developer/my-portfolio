@@ -24,7 +24,9 @@ import {
   BookOpen,
   Zap,
   KeyRound,
-  ExternalLink
+  ExternalLink,
+  Download,
+  Eye
 } from 'lucide-react';
 import avatarImg from './assets/images/avatar.jpg';
 
@@ -308,6 +310,12 @@ export default function App() {
               <button onClick={() => scrollToSection('contact')} className="px-8 py-4 bg-slate-900 border border-slate-800 text-white text-xs md:text-sm font-black rounded-xl hover:bg-slate-800 transition-all active:scale-95">
                 LIÊN HỆ
               </button>
+              <a href="/CV_VoThienNhi.pdf" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-slate-900 border border-slate-800 text-white text-xs md:text-sm font-black rounded-xl hover:bg-slate-800 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <Eye className="w-4 h-4" /> XEM CV
+              </a>
+              <a href="/CV_VoThienNhi.pdf" download className="px-8 py-4 bg-slate-900 border border-slate-800 text-white text-xs md:text-sm font-black rounded-xl hover:bg-slate-800 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <Download className="w-4 h-4" /> TẢI CV
+              </a>
             </div>
           </motion.div>
 
@@ -522,7 +530,7 @@ export default function App() {
                 <div className="p-6 md:p-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row gap-4 flex-shrink-0">
                   {selectedProject.liveUrl && (
                     <a href={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-sky-500 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-sky-400 transition-all">
-                      <ExternalLink className="w-4 h-4" /> Xem Demo
+                      <ExternalLink className="w-4 h-4" /> Xem Web
                     </a>
                   )}
                   {selectedProject.githubUrl && (
