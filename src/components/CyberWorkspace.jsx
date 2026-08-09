@@ -55,6 +55,7 @@ export default function CyberWorkspace({ onHover }) {
       { label: "NODE", symbol: "⬢", color: "#4ade80", group: "accent", level: "Vững" },
       { label: "NESTJS", symbol: "N", color: "#ef4444", group: "accent", level: "Vững" },
       { label: "TAILWIND", symbol: "~", color: "#22d3ee", group: "accent", level: "Thành thạo" },
+      { label: "WORDPRESS", symbol: "W", color: "#21759b", group: "accent", level: "Cơ bản" },
       { label: "MYSQL", symbol: "DB", color: "#f59e0b", group: "sys" },
       { label: "SUPABASE", symbol: "⚡", color: "#4ade80", group: "sys" },
       { label: "SOCKET.IO", symbol: "⚙", color: "#a855f7", group: "sys" },
@@ -92,8 +93,13 @@ export default function CyberWorkspace({ onHover }) {
       return texture;
     };
 
+    const cols = 5;
+    const rows = Math.ceil(skills.length / cols);
+    const rowStart = -((rows - 1) / 2) * 1.05;
+    const lastRowCount = skills.length - (rows - 1) * cols;
+
     const chassis = new THREE.Mesh(
-      new THREE.BoxGeometry(6.6, 0.4, 3.8),
+      new THREE.BoxGeometry(6.6, 0.4, rows * 1.05 + 0.7),
       new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.2 })
     );
     chassis.position.y = -0.15;
@@ -103,8 +109,10 @@ export default function CyberWorkspace({ onHover }) {
     const keyMeshes = [];
 
     skills.forEach((skill, i) => {
-      const row = Math.floor(i / 5);
-      const col = i % 5;
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      const colsInRow = row === rows - 1 ? lastRowCount : cols;
+      const colStart = -((colsInRow - 1) / 2) * 1.05;
 
       const material = new THREE.MeshStandardMaterial({
         map: createKeyTexture(skill.label, skill.symbol, skill.color, skill.group),
@@ -115,7 +123,7 @@ export default function CyberWorkspace({ onHover }) {
       });
 
       const key = new THREE.Mesh(keyGeo, material);
-      key.position.set(-2.1 + col * 1.05, 0.35, -1 + row * 1.05);
+      key.position.set(colStart + col * 1.05, 0.35, rowStart + row * 1.05);
       key.userData = { ...skill, originalY: 0.35 };
       group.add(key);
       keyMeshes.push(key);
