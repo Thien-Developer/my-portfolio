@@ -208,7 +208,7 @@ export default function App() {
       ],
       icon: <Globe className="w-10 h-10 text-sky-400" />,
       theme: "sky",
-      liveUrl: "http://tuanhuycomputer.ct.ws",
+      liveUrl: "https://tuanhuycomputer.ct.ws",
       githubUrl: "https://github.com/Thien-Developer/tuanhuy-computer"
     },
     {
